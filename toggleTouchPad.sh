@@ -34,10 +34,10 @@ log_event() {
 }
 
 execute() {
-    
-    local TOUCHPAD_ID=$1
-    local MOUSE_ID=$2
 
+    TOUCHPAD_ID=`xinput list | grep "TouchPad" | grep -P 'id=\d+' -o | sed 's/id=//'`
+    MOUSE_ID=`xinput list | awk '/Virtual core pointer/,/Virtual core keyboard/' | grep -P "(Wireless\sReceiver|Mouse)" | grep -v -e "Keyboard" | grep -P 'id=\d+' -o | sed 's/id=//'`
+    
     log "TOUCHPAD ID : $TOUCHPAD_ID | MOUSE ID: $MOUSE_ID"
 
     if [ ! $MOUSE_ID ]; then
@@ -70,8 +70,6 @@ execute() {
 
 }
 
-DEVICE_TOUCHPAD_ID=`xinput list | grep "TouchPad" | grep -P 'id=\d+' -o | sed 's/id=//'`
-DEVICE_MOUSE_ID=`xinput list | grep -P "(Wireless\s*Receiver|Mouse)" | grep -v "Keyboard" | grep -P 'id=\d+' -o | sed 's/id=//'`
 
 if [ "$1" = "-s" ]; then
     
@@ -79,7 +77,7 @@ if [ "$1" = "-s" ]; then
 
         log "Running In Single Execution Mode"
 
-        execute $DEVICE_TOUCHPAD_ID $DEVICE_MOUSE_ID
+        execute
 
 else
 
@@ -89,7 +87,7 @@ else
 
         log "Running In Service Mode"
 
-        execute $DEVICE_TOUCHPAD_ID $DEVICE_MOUSE_ID
+        execute
 
         sleep $INTERVAL_IN_SECONDS
 
